@@ -9,9 +9,14 @@
 import SpriteKit
 import GameplayKit
 
+let BlockSize: CGFloat = 20.0
 let TickLengthLevelOne = TimeInterval(600)
 
 class GameScene: SKScene {
+    
+    let gameLayer = SKNode()
+    let shapeLayer = SKNode()
+    let LayerPosition = CGPoint(x:6, y:-6)
     
     private var label : SKLabelNode?
     private var spinnyNode : SKShapeNode?
@@ -20,6 +25,8 @@ class GameScene: SKScene {
     var tick: (() -> ())?
     var tickLengthMillis = TickLengthLevelOne
     var lastTick: NSDate?
+    
+    var textureCache = Dictionary<String, SKTexture>()
     
     required init(coder aDecoder: NSCoder) {
         fatalError("NSCoder not supported")
@@ -34,6 +41,17 @@ class GameScene: SKScene {
         background.position = CGPoint(x: 0, y: 0)
         background.anchorPoint = CGPoint(x: 0, y: 1.0)
         addChild(background)
+        
+        addChild(gameLayer)
+        let gameBoardTexture = SKTexture(imageNamed: "gameboard")
+        let gameBoard = SKSpriteNode(texture: gameBoardTexture, size: CGSizeMake(BlockSize * CGFloat(NumColumns), BlockSize * CGFloat(NumRows)))
+        gameBoard.anchorPoint = CGPoint(x:0, y:1.0)
+        gameBoard.position = LayerPosition
+        
+        shapeLayer.position = LayerPosition
+        shapeLayer.addChild(gameBoard)
+        gameLayer.addChild(shapeLayer)
+        
     }
     
     func touchDown(atPoint pos : CGPoint) {
@@ -102,4 +120,11 @@ class GameScene: SKScene {
         
         lastTick = NSDate()
     }
-}
+    
+    func pointForColumn(column: Int, row: Int) -> CGPoint {
+        let x = LayerPosition.x + (CGFloat(column) * BlockSize) + (BlockSize / 2)
+        let y = LayerPosition.y - ((CGFloat(row) * BlockSize) + (BlockSize / 2))
+        return CGPointMake(x, y)
+    }
+    
+   }
